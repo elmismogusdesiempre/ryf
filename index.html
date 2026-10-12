@@ -1057,6 +1057,68 @@ function initSettings(){
 /* =========================================================
    INICIO
 ========================================================= */
+
+(function () {
+  var NOMBRES = {
+    futbol:   { emoji: "⚽", label: "Fútbol",    nombre: "La Zona" },
+    kawaii:   { emoji: "🌸", label: "Kawaii",    nombre: "MatiPop" },
+    cocina:   { emoji: "🍳", label: "Cocina",    nombre: "Al Punto" },
+    infantil: { emoji: "🧸", label: "Infantil",  nombre: "MatiMundo" },
+    clasico:  { emoji: "📚", label: "Clásico",   nombre: "Áxiom" },
+    espacio:  { emoji: "🚀", label: "Espacio",   nombre: "Órbita" }
+  };
+  function marca() { return NOMBRES[state.tema] || NOMBRES.futbol; }
+
+  function pintarNombre() {
+    var m = marca();
+    document.title = m.nombre;
+    var brand = document.querySelector(".brand-t");
+    if (brand) brand.textContent = m.nombre;
+    var logo = document.querySelector(".logo");
+    if (logo) logo.textContent = m.emoji;
+    document.querySelectorAll(".theme-card").forEach(function (c) {
+      var t = NOMBRES[c.dataset.theme];
+      if (t) c.textContent = t.emoji + " " + t.label + " · " + t.nombre;
+    });
+    var h1 = document.querySelector("#app h1");
+    if (h1) {
+      var esNombre = h1.textContent === "El Penal de las Funciones";
+      for (var k in NOMBRES) if (NOMBRES[k].nombre === h1.textContent) esNombre = true;
+      if (esNombre) h1.textContent = m.nombre;
+    }
+  }
+
+  var _aplicarTema = aplicarTema;
+  aplicarTema = function () { _aplicarTema(); pintarNombre(); };
+
+  var _vistaInicio = vistaInicio;
+  vistaInicio = function () {
+    return _vistaInicio().replace(
+      "<h1>El Penal de las Funciones</h1>",
+      "<h1>" + marca().nombre + "</h1>"
+    );
+  };
+
+  var _descargarPDF = descargarPDF;
+  descargarPDF = function () {
+    var append = document.body.appendChild.bind(document.body);
+    document.body.appendChild = function (node) {
+      document.body.appendChild = append;
+      if (node && node.srcdoc && node.srcdoc.indexOf("Reporte: Relaciones y Funciones") !== -1) {
+        var m = marca();
+        node.srcdoc = node.srcdoc.replace(
+          "⚽ Reporte: Relaciones y Funciones",
+          m.emoji + " Reporte · " + m.nombre
+        );
+      }
+      return append(node);
+    };
+    try { _descargarPDF(); }
+    finally { document.body.appendChild = append; }
+  };
+})();
+
+  
 initSettings();
 render();
 </script>
