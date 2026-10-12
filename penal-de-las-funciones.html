@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Penal de las Funciones</title>
+<style>
+:root{
+  --r:16px; --bw:2.5px;
+  --ok:#16a064; --ok-bg:#d8f6e6; --ok-ink:#06432a;
+  --bad:#d62839; --bad-bg:#ffe1e5; --bad-ink:#5c0a14;
+  --font:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+
+/* ---------- TEMAS ---------- */
+body.theme-futbol{--bg1:#8fd45a;--bg2:#3fa34d;--panel:#ffffff;--panel-alt:#edf9e4;--primary:#1b7f2a;--primary-dark:#0e5c1b;--accent:#ffb000;--on-accent:#2a1d00;--text:#0e2e0a;--muted:#4a6644;--dot:rgba(255,255,255,.22)}
+body.theme-kawaii{--bg1:#ffd1ec;--bg2:#d7b8ff;--panel:#ffffff;--panel-alt:#fff0f8;--primary:#e0407f;--primary-dark:#a8245c;--accent:#7f4fff;--on-accent:#ffffff;--text:#4a0e35;--muted:#86506f;--dot:rgba(255,255,255,.4)}
+body.theme-cocina{--bg1:#ffe8b0;--bg2:#ffb347;--panel:#fffdf6;--panel-alt:#fff3d6;--primary:#c4461a;--primary-dark:#8a2e0a;--accent:#2f8f5b;--on-accent:#ffffff;--text:#3b1700;--muted:#7a5230;--dot:rgba(255,255,255,.35)}
+body.theme-infantil{--bg1:#bde0fe;--bg2:#90e0ef;--panel:#ffffff;--panel-alt:#eaf7ff;--primary:#0077b6;--primary-dark:#023e8a;--accent:#ff477e;--on-accent:#ffffff;--text:#001d3d;--muted:#3d5a80;--dot:rgba(255,255,255,.4)}
+body.theme-clasico{--bg1:#f5f1e8;--bg2:#d8cfbb;--panel:#fffdf7;--panel-alt:#efe7d2;--primary:#6b4423;--primary-dark:#3d240f;--accent:#b8864a;--on-accent:#1f1204;--text:#2a1a0a;--muted:#6e5a43;--dot:rgba(0,0,0,.05)}
+body.theme-espacio{--bg1:#2b2d64;--bg2:#5a3b9c;--panel:#f3efff;--panel-alt:#e3dbff;--primary:#6a3fff;--primary-dark:#3a1a99;--accent:#ffd23f;--on-accent:#1a0d3d;--text:#1a0d3d;--muted:#51407f;--dot:rgba(255,255,255,.12)}
+
+body{
+  font-family:var(--font);font-size:17px;line-height:1.55;color:var(--text);
+  min-height:100vh;background:linear-gradient(135deg,var(--bg1),var(--bg2)) fixed;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(var(--dot) 1.6px,transparent 1.7px);background-size:24px 24px;
+}
+:focus-visible{outline:3px solid #2563eb;outline-offset:3px}
+
+/* ---------- BARRA SUPERIOR ---------- */
+.appbar{position:sticky;top:0;z-index:60;background:var(--panel);border-bottom:var(--bw) solid var(--text);box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.appbar-in{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{flex:0 0 44px;height:44px;border-radius:12px;background:var(--primary);border:var(--bw) solid var(--text);box-shadow:0 3px 0 var(--text);display:grid;place-items:center;font-size:1.4rem}
+.brand-t{font-weight:900;font-size:1.05rem;letter-spacing:-.01em;line-height:1.1}
+.brand-s{font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.actions{display:flex;gap:8px}
+
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:22px 16px 90px}
+
+/* ---------- BOTONES ---------- */
+.btn{
+  font:inherit;font-weight:800;font-size:1rem;line-height:1.2;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 20px;border:var(--bw) solid var(--text);border-radius:12px;
+  background:var(--primary);color:#fff;cursor:pointer;
+  box-shadow:0 4px 0 var(--text);transition:transform .08s,box-shadow .08s,filter .15s;
+}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 0 var(--text);filter:brightness(1.06)}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--text)}
+.btn.ghost{background:var(--panel);color:var(--text)}
+.btn.accent{background:var(--accent);color:var(--on-accent)}
+.btn.lg{font-size:1.1rem;padding:15px 28px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.icon-btn{width:44px;height:44px;padding:0;font-size:1.15rem}
+
+/* ---------- PANELES ---------- */
+.panel{background:var(--panel);border:var(--bw) solid var(--text);border-radius:var(--r);box-shadow:5px 5px 0 var(--text);padding:clamp(18px,3vw,30px);margin-bottom:22px;animation:rise .35s ease both}
+.panel-alt{background:var(--panel-alt)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+h1{font-size:clamp(2rem,6vw,3.1rem);line-height:1.05;letter-spacing:-.03em;font-weight:900}
+h2{font-size:clamp(1.35rem,3.5vw,1.8rem);line-height:1.15;letter-spacing:-.02em;font-weight:900;margin-bottom:12px}
+h3{font-size:1.15rem;font-weight:800;margin-bottom:10px}
+p+p,p+ul,ul+p,p+ol,ol+p{margin-top:10px}
+ul,ol{padding-left:24px}
+li+li{margin-top:4px}
+.lead{font-size:1.12rem;font-weight:600}
+.muted{color:var(--muted)}
+.eyebrow{display:inline-block;font-size:.75rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--primary-dark);margin-bottom:6px}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:3px 12px;border-radius:999px;background:var(--primary);color:#fff;font-weight:800;font-size:.78rem;border:2px solid var(--text)}
+.callout{border-left:6px solid var(--accent);background:var(--panel-alt);padding:12px 16px;border-radius:0 12px 12px 0;margin-top:14px;font-weight:600}
+.panel-alt .callout{background:var(--panel)}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.center{text-align:center}.center .row{justify-content:center}
+.hidden{display:none!important}
+
+/* ---------- HERO / INICIO ---------- */
+.hero{display:grid;gap:18px}
+.hero .sub{font-size:1.15rem;font-weight:600;max-width:46ch}
+.field{width:100%;max-width:420px;font:inherit;font-weight:800;font-size:1.25rem;padding:14px 16px;border:var(--bw) solid var(--text);border-radius:12px;background:var(--panel-alt);color:var(--text)}
+.field.err{border-color:var(--bad);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:6px}
+.mcard{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:var(--bw) solid var(--text);border-radius:14px;padding:14px;box-shadow:3px 3px 0 var(--text)}
+.mcard .ic{flex:0 0 42px;height:42px;border-radius:12px;background:var(--panel-alt);border:2px solid var(--text);display:grid;place-items:center;font-size:1.3rem}
+.mcard b{display:block;font-size:1rem}
+.mcard span{font-size:.9rem;color:var(--muted);font-weight:600}
+
+/* ---------- HUD (pasos + progreso) ---------- */
+.hud{margin-bottom:18px}
+.steps{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 12px;scrollbar-width:thin}
+.step{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:7px 14px 7px 8px;border:var(--bw) solid var(--text);border-radius:999px;background:var(--panel);font:inherit;font-weight:800;font-size:.88rem;color:var(--text);cursor:pointer;box-shadow:0 3px 0 var(--text)}
+.step .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--panel-alt);border:2px solid var(--text);font-size:.8rem}
+.step.active{background:var(--primary);color:#fff}
+.step.active .n{background:#fff;color:var(--primary-dark)}
+.step.done .n{background:var(--ok);color:#fff}
+.step:disabled{opacity:.5;cursor:not-allowed}
+.progress{height:16px;background:var(--panel);border:var(--bw) solid var(--text);border-radius:999px;overflow:hidden}
+.progress>div{height:100%;width:0;background:repeating-linear-gradient(45deg,var(--primary),var(--primary) 10px,var(--primary-dark) 10px,var(--primary-dark) 20px);transition:width .5s}
+.prog-meta{display:flex;justify-content:space-between;margin-top:6px;font-weight:800;font-size:.85rem;color:var(--text)}
+.hud .prog-meta{background:var(--panel);display:inline-flex;gap:14px;padding:2px 12px;border:2px solid var(--text);border-radius:999px;margin-top:10px}
+
+/* ---------- PREGUNTAS ---------- */
+.q{background:var(--panel);border:var(--bw) solid var(--text);border-radius:14px;padding:clamp(14px,2.5vw,22px);margin-bottom:18px;box-shadow:3px 3px 0 var(--text)}
+.q-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.q-num{flex:0 0 34px;height:34px;border-radius:10px;background:var(--primary);color:#fff;border:2px solid var(--text);display:grid;place-items:center;font-weight:900}
+.q.done .q-num{background:var(--text)}
+.q-title{flex:1;font-weight:800;font-size:1.08rem;line-height:1.35;padding-top:3px}
+.speak{flex:0 0 36px;height:36px;border:2px solid var(--text);border-radius:10px;background:var(--panel-alt);cursor:pointer;font-size:1rem}
+.q-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px}
+.option{display:flex;align-items:center;gap:12px;text-align:left;font:inherit;font-weight:700;font-size:1rem;line-height:1.3;padding:12px 14px;border:var(--bw) solid var(--text);border-radius:12px;background:var(--panel-alt);color:var(--text);cursor:pointer;box-shadow:0 3px 0 var(--text);transition:transform .08s,box-shadow .08s}
+.option:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--text)}
+.option .chip{flex:0 0 28px;height:28px;border-radius:8px;border:2px solid currentColor;display:grid;place-items:center;font-weight:900;font-size:.85rem}
+.q.done .option{pointer-events:none;box-shadow:0 3px 0 var(--text);transform:none}
+.option.correct{background:var(--ok);color:#fff}
+.option.wrong{background:var(--bad);color:#fff}
+.option.reveal{outline:3px dashed var(--ok);outline-offset:2px}
+.feedback{display:none;gap:12px;align-items:flex-start;margin-top:14px;padding:12px 14px;border:var(--bw) solid var(--text);border-radius:12px;font-weight:600;font-size:.98rem}
+.feedback.show{display:flex;animation:pop .25s}
+.feedback.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.feedback.bad{background:var(--bad-bg);color:var(--bad-ink)}
+.feedback .fi{font-size:1.25rem;line-height:1.2}
+
+/* ---------- DIAGRAMAS SVG ---------- */
+.viz{width:100%;max-width:720px;height:auto;margin:4px auto 16px;display:block;background:var(--panel-alt);border:var(--bw) solid var(--text);border-radius:12px;padding:6px}
+.panel-alt .viz{background:var(--panel)}
+.viz text{font-family:var(--font);font-weight:800;pointer-events:none}
+.viz .hd{font-size:15px;fill:var(--muted);letter-spacing:.1em}
+.viz .ln{stroke:var(--text);stroke-width:2.6;fill:none}
+.node-a rect{fill:var(--primary);stroke:var(--text);stroke-width:2.5}
+.node-a text{fill:#fff}
+.node-b rect{fill:var(--accent);stroke:var(--text);stroke-width:2.5}
+.node-b text{fill:var(--on-accent)}
+.node-fail rect{fill:var(--bad)}
+.node-fail text{fill:#fff}
+.node-focus rect{stroke-width:6}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-top:14px}
+.pair .viz{margin-bottom:8px}
+.cap{display:flex;gap:8px;align-items:center;font-weight:800;font-size:.95rem}
+
+/* ---------- FÓRMULAS (módulo 4) ---------- */
+.formulas{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px}
+.fcard{background:var(--panel-alt);border:var(--bw) solid var(--text);border-radius:12px;padding:12px 14px;box-shadow:3px 3px 0 var(--text);font-weight:800}
+.fcard small{display:block;color:var(--muted);font-weight:700}
+.fcard .arrow{color:var(--primary)}
+
+/* ---------- JUEGO DE FLECHAS ---------- */
+.mission{display:flex;gap:12px;align-items:flex-start;background:var(--accent);color:var(--on-accent);border:var(--bw) solid var(--text);border-radius:12px;padding:12px 16px;font-weight:800;box-shadow:3px 3px 0 var(--text);margin-bottom:12px}
+.mission small{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.hint{font-weight:600;color:var(--muted);margin-bottom:6px}
+.game{position:relative}
+.game-cols{display:flex;justify-content:center;gap:clamp(70px,22vw,220px);margin:14px 0 20px}
+.game-col{display:flex;flex-direction:column;gap:16px;align-items:center}
+.col-title{font-weight:900;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.node{position:relative;width:80px;height:58px;border:var(--bw) solid var(--text);border-radius:14px;font:inherit;font-weight:900;font-size:1.15rem;cursor:pointer;color:#fff;background:var(--primary);box-shadow:0 4px 0 var(--text);transition:transform .1s}
+.node.b{background:var(--accent);color:var(--on-accent)}
+.node:hover{transform:translateY(-2px)}
+.node.sel{outline:4px solid var(--ok);outline-offset:3px;transform:translateY(-2px)}
+.node .cnt{position:absolute;top:-11px;right:-11px;min-width:24px;height:24px;border-radius:12px;background:var(--panel);color:var(--text);border:2px solid var(--text);font-size:.75rem;font-weight:900;display:none;place-items:center;padding:0 4px}
+.node .cnt.on{display:grid}
+.game-svg{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible}
+.game-svg .gl{stroke:var(--text);stroke-width:3.5;fill:none}
+.game-svg .hit{stroke:transparent;stroke-width:20;fill:none;pointer-events:stroke;cursor:pointer}
+.game-svg .hit:hover+.gl{stroke:var(--bad);stroke-width:5}
+
+/* ---------- NAVEGACIÓN ---------- */
+.navrow{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:6px}
+
+/* ---------- RESULTADOS ---------- */
+.ring{--p:0;width:170px;height:170px;border-radius:50%;margin:0 auto 18px;display:grid;place-items:center;background:conic-gradient(var(--primary) calc(var(--p)*1%),var(--panel-alt) 0);border:var(--bw) solid var(--text);box-shadow:4px 4px 0 var(--text)}
+.ring>div{width:128px;height:128px;border-radius:50%;background:var(--panel);border:var(--bw) solid var(--text);display:grid;place-items:center;align-content:center}
+.ring b{font-size:2.2rem;line-height:1;font-weight:900}
+.ring small{font-weight:800;color:var(--muted)}
+.mrow{display:grid;grid-template-columns:minmax(100px,170px) 1fr 54px;gap:12px;align-items:center;margin:10px 0;font-weight:800;font-size:.95rem}
+.mrow .progress{height:14px}
+.rev{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:var(--bw) solid var(--text);border-radius:12px;margin-bottom:10px;background:var(--panel-alt);font-size:.95rem}
+.rev .ic{font-size:1.2rem}
+.rev small{display:block;color:var(--muted);font-weight:700}
+
+/* ---------- AJUSTES ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(10,10,20,.6);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
+.modal-bg.show{display:flex}
+.modal{background:var(--panel);border:var(--bw) solid var(--text);border-radius:var(--r);box-shadow:8px 8px 0 var(--text);padding:24px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;animation:pop .2s}
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0 18px}
+.theme-card{padding:14px 10px;border:var(--bw) solid var(--text);border-radius:12px;cursor:pointer;text-align:center;font:inherit;font-weight:800;color:var(--text);background:var(--panel-alt);box-shadow:0 3px 0 var(--text)}
+.theme-card.active{outline:4px solid var(--accent);outline-offset:3px;background:var(--primary);color:#fff}
+.switch-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-weight:800}
+.switch{position:relative;width:62px;height:34px;background:#c9c9d3;border:var(--bw) solid var(--text);border-radius:999px;cursor:pointer;padding:0}
+.switch.on{background:var(--primary)}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;background:#fff;border:2px solid var(--text);border-radius:50%;transition:left .2s}
+.switch.on::after{left:30px}
+
+@media (max-width:600px){
+  body{font-size:16px}
+  .brand-s{display:none}
+  .btn{padding:11px 16px}
+  .node{width:68px;height:54px}
+  .mrow{grid-template-columns:90px 1fr 46px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{.appbar,.actions{display:none}}
+</style>
+</head>
+<body class="theme-futbol">
+
+<header class="appbar">
+  <div class="appbar-in">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">⚽</div>
+      <div>
+        <div class="brand-t">El Penal de las Funciones</div>
+        <div class="brand-s">Relaciones y funciones</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost icon-btn" id="btnSettings" aria-label="Ajustes" title="Ajustes">⚙️</button>
+      <button class="btn ghost icon-btn" id="btnMute" aria-label="Silenciar o activar sonido" title="Sonido">🔊</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<div class="modal-bg" id="settingsModal" role="dialog" aria-modal="true" aria-label="Ajustes">
+  <div class="modal">
+    <h2>⚙️ Ajustes</h2>
+    <h3>Tema visual</h3>
+    <div class="theme-grid" id="themeGrid">
+      <button class="theme-card" data-theme="futbol">⚽ Fútbol</button>
+      <button class="theme-card" data-theme="kawaii">🌸 Kawaii</button>
+      <button class="theme-card" data-theme="cocina">🍳 Cocina</button>
+      <button class="theme-card" data-theme="infantil">🧸 Infantil</button>
+      <button class="theme-card" data-theme="clasico">📚 Clásico</button>
+      <button class="theme-card" data-theme="espacio">🚀 Espacio</button>
+    </div>
+    <h3>Sonido y voz</h3>
+    <div class="switch-row"><span>🔊 Efectos de sonido</span><button class="switch on" id="swSfx" aria-label="Efectos de sonido"></button></div>
+    <div class="switch-row"><span>🗣️ Lectura en voz alta</span><button class="switch on" id="swVoz" aria-label="Lectura en voz alta"></button></div>
+    <div class="row" style="margin-top:20px">
+      <button class="btn ghost" id="btnCloseSettings">Cerrar</button>
+      <button class="btn" id="btnRestart">🔄 Reiniciar todo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   UTILIDADES
+========================================================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick = a => a[Math.floor(Math.random()*a.length)];
+function shuffle(a){ const r=a.slice(); for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; } return r; }
+const fmt = n => String(n).replace('-','−');
+const conj = arr => '{' + arr.join(', ') + '}';
+const rangoNums = (a,b) => { const r=[]; for(let i=a;i<=b;i++) r.push(i); return r; };
+function lista(a){ return a.length<2 ? a.join('') : a.slice(0,-1).join(', ')+' y '+a[a.length-1]; }
+
+/* Devuelve opciones únicas: la correcta + distractores distintos, mezcladas */
+function mkOpts(correcta, distractores, n=4){
+  const seen=new Set([correcta]); const out=[correcta];
+  for (const d of shuffle(distractores)) { if (out.length>=n) break; if (!seen.has(d)) { seen.add(d); out.push(d); } }
+  return shuffle(out).map(t => ({ texto:t, correcta: t===correcta }));
+}
+
+/* Preferencias guardadas (try/catch: funciona aunque el navegador bloquee el almacenamiento) */
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('penal_'+k); return v===null?d:JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem('penal_'+k, JSON.stringify(v)); }catch(e){} }
+};
+
+/* =========================================================
+   ESTADO
+========================================================= */
+const state = {
+  nombre: store.get('nombre',''),
+  tema:   store.get('tema','futbol'),
+  sfx:    store.get('sfx',true),
+  voz:    store.get('voz',true),
+  vista:'inicio', mod:0,
+  banco:{}, registros:{}, juegoF:null, nF:0
+};
+
+/* =========================================================
+   AUDIO Y VOZ
+========================================================= */
+let audioCtx=null;
+function beep(freq=440, dur=0.12, type='square', vol=0.07){
+  if (!state.sfx) return;
+  try{
+    if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if (audioCtx.state==='suspended') audioCtx.resume();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type; o.frequency.value=freq; g.gain.value=vol;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+dur);
+    o.stop(audioCtx.currentTime+dur);
+  }catch(e){}
+}
+const sfxClick = () => beep(600,0.06,'square',0.05);
+const sfxOk  = () => { beep(700,0.1); setTimeout(()=>beep(950,0.14),100); };
+const sfxBad = () => { beep(220,0.18,'sawtooth',0.08); setTimeout(()=>beep(160,0.2,'sawtooth',0.08),120); };
+const sfxWin = () => [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.14),i*110));
+function hablar(txt){
+  if (!state.voz) return;
+  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.lang='es-ES'; u.rate=0.95; u.pitch=1.05; speechSynthesis.speak(u); }catch(e){}
+}
+const callar = () => { try{ speechSynthesis.cancel(); }catch(e){} };
+
+/* =========================================================
+   CONTENIDO ALEATORIO
+========================================================= */
+const JUG = ['Messi','Cristiano','Neymar','Mbappé','Haaland','Modrić','Bellingham','Vinícius','Kane','Salah'];
+const ARQ = ['Dibu','Courtois','Alisson','Navas','Oblak','Ter Stegen','Donnarumma','Ederson'];
+
+/* Conjuntos A y B SIN elementos repetidos (en la versión anterior los números de B podían repetirse) */
+function contenido(nA,nB){
+  const t = pick(['futbol','numeros','abstracto']);
+  if (t==='futbol')  return { A:shuffle(JUG).slice(0,nA), B:shuffle(ARQ).slice(0,nB), la:'Pateadores', lb:'Arqueros' };
+  if (t==='numeros') return {
+    A: shuffle(rangoNums(1,12)).slice(0,nA).sort((x,y)=>x-y).map(String),
+    B: shuffle(rangoNums(2,24)).slice(0,nB).sort((x,y)=>x-y).map(String),
+    la:'Conjunto A', lb:'Conjunto B'
+  };
+  return { A:rangoNums(1,nA).map(i=>'a'+i), B:rangoNums(1,nB).map(i=>'b'+i), la:'Conjunto A', lb:'Conjunto B' };
+}
+
+/* modo: funcion | existencia | unicidad | ambas  (cada modo garantiza exactamente la falla indicada) */
+function construirFlechas(nA,nB,modo){
+  const f=[]; const x=rnd(0,nA-1); let y=rnd(0,nA-1); while(y===x) y=rnd(0,nA-1);
+  for (let i=0;i<nA;i++){
+    const b=rnd(0,nB-1);
+    if ((modo==='existencia'||modo==='ambas') && i===x) continue;
+    f.push([i,b]);
+    if ((modo==='unicidad' && i===x) || (modo==='ambas' && i===y)){
+      let b2=rnd(0,nB-1); while(b2===b) b2=rnd(0,nB-1);
+      f.push([i,b2]);
+    }
+  }
+  return f;
+}
+
+function analizar(A, flechas){
+  const cuenta = A.map(()=>0);
+  flechas.forEach(([a])=>cuenta[a]++);
+  const sinFlecha=[], varias=[];
+  cuenta.forEach((c,i)=>{ if(c===0) sinFlecha.push(i); else if(c>1) varias.push(i); });
+  const ok = !sinFlecha.length && !varias.length;
+  let razon;
+  if (ok) razon = 'Todos los elementos de A tienen exactamente una flecha.';
+  else {
+    const p=[];
+    if (sinFlecha.length) p.push(`Sin flecha: ${lista(sinFlecha.map(i=>A[i]))} (falla la existencia).`);
+    if (varias.length)    p.push(`Con más de una flecha: ${lista(varias.map(i=>A[i]))} (falla la unicidad).`);
+    razon = p.join(' ');
+  }
+  return { ok, sinFlecha, varias, razon, cuenta };
+}
+
+/* =========================================================
+   SVG: DIAGRAMA DE CONJUNTOS
+========================================================= */
+let svgN = 0;
+function svgConjuntos({ A, B, flechas, labelA='A', labelB='B', foco=null }){
+  const id='sv'+(++svgN), W=700, hw=54, nh=44, xA=150, xB=550;
+  const n=Math.max(A.length,B.length), H=Math.max(300, n*62+100), cy=(H+50)/2;
+  const gA = A.length>1 ? Math.min(68,(H-130)/(A.length-1)) : 0;
+  const gB = B.length>1 ? Math.min(68,(H-130)/(B.length-1)) : 0;
+  const yA = A.map((_,i)=>cy-gA*(A.length-1)/2+i*gA);
+  const yB = B.map((_,i)=>cy-gB*(B.length-1)/2+i*gB);
+  const nodo = (cls,i,x,y,t,extra)=>{
+    t=String(t); const fs = t.length>9?15 : t.length>6?17 : 21;
+    return `<g class="${cls}${extra?' node-focus':''}" data-idx="${i}"><rect x="${x-hw}" y="${y-nh/2}" width="${hw*2}" height="${nh}" rx="11"/><text x="${x}" y="${y}" dy=".35em" text-anchor="middle" font-size="${fs}">${esc(fmt(t))}</text></g>`;
+  };
+  let s=`<svg class="viz" viewBox="0 0 ${W} ${H}" role="img" aria-label="Diagrama de relación entre dos conjuntos" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<defs><marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--text)"/></marker></defs>`;
+  s+=`<text class="hd" x="${xA}" y="32" text-anchor="middle">${esc(labelA.toUpperCase())}</text>`;
+  s+=`<text class="hd" x="${xB}" y="32" text-anchor="middle">${esc(labelB.toUpperCase())}</text>`;
+  flechas.forEach(([a,b])=>{ s+=`<line class="ln" x1="${xA+hw}" y1="${yA[a]}" x2="${xB-hw-3}" y2="${yB[b]}" marker-end="url(#${id})"/>`; });
+  A.forEach((t,i)=>{ s+=nodo('node-a',i,xA,yA[i],t, foco&&foco.side==='A'&&foco.idx===i); });
+  B.forEach((t,i)=>{ s+=nodo('node-b',i,xB,yB[i],t, foco&&foco.side==='B'&&foco.idx===i); });
+  return s+'</svg>';
+}
+
+/* =========================================================
+   GENERADORES DE PREGUNTAS
+========================================================= */
+/* ---- Módulo 1: leer relaciones ---- */
+function genM1(i){
+  if (i===2){
+    const c=[
+      'Un elemento de A puede tener 0, 1 o varias flechas',
+      'Todo elemento de A debe tener exactamente una flecha',
+      'Dos elementos de A nunca pueden llegar al mismo elemento de B',
+      'Todo elemento de B debe recibir al menos una flecha'
+    ];
+    return { modulo:'Módulo 1', etiqueta:'Idea clave de relación', viz:'', fallas:[],
+      enunciado:'Sobre las relaciones entre conjuntos, ¿qué afirmación es correcta?',
+      opciones: mkOpts(c[0], c.slice(1), 4),
+      explicacion:'En una relación cualquiera no hay reglas estrictas. La regla de «exactamente una flecha por elemento de A» es la que convierte una relación en función.' };
+  }
+  const nA=rnd(3,5), nB=rnd(3,5), co=contenido(nA,nB);
+  const fl=construirFlechas(nA,nB,pick(['funcion','existencia','unicidad','ambas']));
+  const an=analizar(co.A,fl);
+  if (i===0){
+    const k=rnd(0,nA-1), c=an.cuenta[k];
+    return { modulo:'Módulo 1', etiqueta:`Flechas que salen de ${co.A[k]}`, fallas:[],
+      enunciado:`¿Cuántas flechas salen de «${fmt(co.A[k])}»? (está resaltado en el diagrama)`,
+      viz: svgConjuntos({A:co.A,B:co.B,flechas:fl,labelA:co.la,labelB:co.lb,foco:{side:'A',idx:k}}),
+      opciones: mkOpts(String(c), ['0','1','2','3'].filter(x=>x!==String(c)), 4),
+      explicacion: c===0 ? `De «${fmt(co.A[k])}» no sale ninguna flecha. En una relación eso está permitido.` : `De «${fmt(co.A[k])}» salen ${c} flecha${c>1?'s':''}.` };
+  }
+  let k=rnd(0,nA-1); while(an.cuenta[k]===0) k=(k+1)%nA;
+  const dest=fl.filter(f=>f[0]===k).map(f=>f[1]).sort((a,b)=>a-b);
+  const ok=conj(dest.map(j=>co.B[j]));
+  const d=new Set();
+  for(let t=0;t<40&&d.size<3;t++){
+    const sub=shuffle(rangoNums(0,nB-1)).slice(0,rnd(1,2)).sort((a,b)=>a-b);
+    const txt=conj(sub.map(j=>co.B[j])); if(txt!==ok) d.add(txt);
+  }
+  return { modulo:'Módulo 1', etiqueta:`Destinos de ${co.A[k]}`, fallas:[],
+    enunciado:`¿Con qué elementos de B está conectado «${fmt(co.A[k])}»?`,
+    viz: svgConjuntos({A:co.A,B:co.B,flechas:fl,labelA:co.la,labelB:co.lb,foco:{side:'A',idx:k}}),
+    opciones: mkOpts(ok,[...d],4),
+    explicacion:`Siguiendo sus flechas, «${fmt(co.A[k])}» llega a ${ok}.` };
+}
+
+/* ---- Módulo 2: ¿por qué NO es función? (una causa exacta por pregunta) ---- */
+let seqM2=[];
+function genM2(i){
+  if (i===0) seqM2=shuffle(['existencia','unicidad','ambas']);
+  const modo=seqM2[i];
+  const nA=rnd(3,5), nB=rnd(3,5), co=contenido(nA,nB);
+  const fl=construirFlechas(nA,nB,modo), an=analizar(co.A,fl);
+  const T={
+    existencia:'Solo falla la existencia: un elemento de A se quedó sin flecha',
+    unicidad:'Solo falla la unicidad: un elemento de A tiene más de una flecha',
+    ambas:'Fallan las dos condiciones a la vez',
+    mito:'Falla porque dos elementos de A llegan al mismo elemento de B'
+  };
+  return { modulo:'Módulo 2', etiqueta:'¿Por qué no es función?', fallas:[...an.sinFlecha,...an.varias],
+    enunciado:'Esta relación NO es una función. ¿Qué condición (o condiciones) no cumple?',
+    viz: svgConjuntos({A:co.A,B:co.B,flechas:fl,labelA:co.la,labelB:co.lb}),
+    opciones: mkOpts(T[modo], Object.keys(T).filter(k=>k!==modo).map(k=>T[k]), 4),
+    explicacion: an.razon+' Recuerda: que dos elementos de A compartan imagen SÍ está permitido.' };
+}
+
+/* ---- Módulo 3: dominio, codominio y rango (siempre sobre funciones) ---- */
+function genM3(i){
+  const nA=rnd(3,5), nB=rnd(4,5), co=contenido(nA,nB);
+  let fl, usados;
+  do {
+    const perm=shuffle(rangoNums(0,nB-1)).slice(0,rnd(2,nB-1));
+    fl=co.A.map((_,k)=>[k,pick(perm)]);
+    usados=[...new Set(fl.map(f=>f[1]))].sort((a,b)=>a-b);
+  } while (usados.length<2 || usados.length>=nB);
+  const libres=rangoNums(0,nB-1).filter(j=>!usados.includes(j));
+  const viz=svgConjuntos({A:co.A,B:co.B,flechas:fl,labelA:'Dominio',labelB:'Codominio'});
+  const base={ modulo:'Módulo 3', viz, fallas:[] };
+  if (i===0){
+    const ok=conj(usados.map(j=>co.B[j]));
+    return { ...base, etiqueta:'Rango de la función',
+      enunciado:'El rango son los elementos de B que reciben flecha. ¿Cuál es el rango de esta función?',
+      opciones: mkOpts(ok,[
+        conj(co.B), conj(co.A),
+        conj(usados.slice(1).map(j=>co.B[j])),
+        conj([...usados,libres[0]].sort((a,b)=>a-b).map(j=>co.B[j]))
+      ],4),
+      explicacion:`Reciben flecha: ${ok}. Ese es el rango. El codominio completo es ${conj(co.B)}.` };
+  }
+  if (i===1){
+    const k=rnd(0,nA-1), img=co.B[fl[k][1]];
+    return { ...base, etiqueta:`Imagen de ${co.A[k]}`,
+      enunciado:`¿Cuál es la imagen de «${fmt(co.A[k])}»? (el elemento de B al que llega su flecha)`,
+      viz: svgConjuntos({A:co.A,B:co.B,flechas:fl,labelA:'Dominio',labelB:'Codominio',foco:{side:'A',idx:k}}),
+      opciones: mkOpts(img, co.B.filter(x=>x!==img), 4),
+      explicacion:`La flecha de «${fmt(co.A[k])}» llega a «${fmt(img)}».` };
+  }
+  const fuera=co.B[pick(libres)];
+  return { ...base, etiqueta:'Elemento fuera del rango',
+    enunciado:'¿Qué elemento del codominio NO pertenece al rango (no recibe ninguna flecha)?',
+    opciones: mkOpts(fuera,[ 'Ninguno: todos reciben flecha', ...usados.map(j=>co.B[j]) ],4),
+    explicacion:`«${fmt(fuera)}» está en el codominio pero ninguna flecha llega a él, así que no está en el rango.` };
+}
+
+/* ---- Módulo 4: función inversa ---- */
+const OPS = {
+  suma:{ f:n=>`f(x) = x + ${n}`, inv:n=>`f⁻¹(x) = x − ${n}`, txt:n=>`Restar ${n}`,           ap:(x,n)=>x+n },
+  resta:{f:n=>`f(x) = x − ${n}`, inv:n=>`f⁻¹(x) = x + ${n}`, txt:n=>`Sumar ${n}`,            ap:(x,n)=>x-n },
+  mult:{ f:n=>`f(x) = x × ${n}`, inv:n=>`f⁻¹(x) = x ÷ ${n}`, txt:n=>`Dividir entre ${n}`,    ap:(x,n)=>x*n },
+  div:{  f:n=>`f(x) = x ÷ ${n}`, inv:n=>`f⁻¹(x) = x × ${n}`, txt:n=>`Multiplicar por ${n}`, ap:(x,n)=>x/n }
+};
+function genM4(i){
+  const n=rnd(2,9);
+  if (i<2){
+    const k = i===0 ? pick(['suma','resta']) : pick(['mult','div']);
+    const ok=OPS[k].txt(n);
+    const dis=[ ...Object.keys(OPS).filter(o=>o!==k).map(o=>OPS[o].txt(n)), 'Elevar al cuadrado', 'Dejar la función igual' ];
+    return { modulo:'Módulo 4', etiqueta:OPS[k].f(n), viz:'', fallas:[],
+      enunciado:`${OPS[k].f(n)}. ¿Qué operación hay que hacer para deshacerla (la inversa)?`,
+      opciones: mkOpts(ok, dis.filter(d=>d!==ok), 4),
+      explicacion:`La inversa deshace la función: ${OPS[k].inv(n)}.` };
+  }
+  const k=pick(Object.keys(OPS));
+  const x = k==='div' ? n*rnd(2,6) : k==='resta' ? rnd(n+1,n+12) : rnd(2,12);
+  const y = OPS[k].ap(x,n);
+  const dis=[y, x+n, Math.abs(x-n), y+n, x+1, x-1].filter(v=>v!==x && v>=0).map(String);
+  return { modulo:'Módulo 4', etiqueta:`${OPS[k].f(n)}, f(${x}) = ${y}`, viz:'', fallas:[],
+    enunciado:`${OPS[k].f(n)}. Si f(${x}) = ${y}, ¿cuánto vale f⁻¹(${y})?`,
+    opciones: mkOpts(String(x), dis, 4),
+    explicacion:`f⁻¹ regresa al valor original: como f(${x}) = ${y}, entonces f⁻¹(${y}) = ${x}.` };
+}
+
+/* ---- Módulo 5: retos abstractos (4 distintos por sesión) ---- */
+let seqM5=[];
+const FIG=[['Triángulo',3],['Cuadrado',4],['Rombo',4],['Rectángulo',4],['Pentágono',5],['Hexágono',6]];
+function genM5(i){
+  if (i===0) seqM5=shuffle(['cuadrado','figuras','definir','evaluar','raiz','rango']);
+  const t=seqM5[i], M='Módulo 5';
+
+  if (t==='cuadrado'){
+    const A=['−2','−1','0','1','2'], B=['0','1','4'], fl=[[0,2],[1,1],[2,0],[3,1],[4,2]];
+    return { modulo:M, etiqueta:'x² con A={−2,−1,0,1,2}', fallas:[],
+      enunciado:'Relación «elevar al cuadrado» de A = {−2, −1, 0, 1, 2} hacia B = {0, 1, 4}. ¿Es función?',
+      viz:svgConjuntos({A,B,flechas:fl,labelA:'A',labelB:'B'}),
+      opciones: mkOpts('Sí: cada elemento de A tiene una sola imagen',[
+        'No: −2 y 2 comparten imagen',
+        'No: hay números negativos en A',
+        'Sí, pero solo para los números positivos'],4),
+      explicacion:'Aunque −2 y 2 lleguen al mismo 4, cada elemento de A tiene UNA sola flecha. La unicidad se exige a las entradas, no a las salidas.' };
+  }
+
+  if (t==='figuras'){
+    const base=[FIG[1],FIG[2]], extra=shuffle([FIG[0],FIG[3],FIG[4],FIG[5]]).slice(0,rnd(1,2));
+    const set=[...base,...extra].sort((a,b)=>a[1]-b[1]);
+    const nums=[...new Set(set.map(f=>f[1]))].sort((a,b)=>a-b).map(String);
+    if (Math.random()<0.5){
+      const A=set.map(f=>f[0]), fl=set.map((f,k)=>[k,nums.indexOf(String(f[1]))]);
+      return { modulo:M, etiqueta:'Figura → número de lados', fallas:[],
+        enunciado:'Relación «número de lados»: cada figura se conecta con su número de lados. ¿Es función?',
+        viz:svgConjuntos({A,B:nums,flechas:fl,labelA:'Figuras',labelB:'Lados'}),
+        opciones: mkOpts('Sí: cada figura tiene un único número de lados, aunque dos compartan número',[
+          'No: el Cuadrado y el Rombo llegan al mismo número',
+          'No: sobran números en B',
+          'Solo es función si las figuras son regulares'],4),
+        explicacion:'Cada figura tiene una sola flecha. Que Cuadrado y Rombo compartan el 4 está permitido.' };
+    }
+    const B=set.map(f=>f[0]), fl=[]; set.forEach((f,k)=>fl.push([nums.indexOf(String(f[1])),k]));
+    return { modulo:M, etiqueta:'Número de lados → figuras', fallas:[nums.indexOf('4')],
+      enunciado:'Ahora al revés: cada número se conecta con las figuras que tienen ese número de lados. ¿Es función?',
+      viz:svgConjuntos({A:nums,B,flechas:fl,labelA:'Lados',labelB:'Figuras'}),
+      opciones: mkOpts('No: el 4 tiene más de una flecha (falla la unicidad)',[
+        'Sí: todos los números tienen al menos una figura',
+        'No: algún número no tiene flecha (falla la existencia)',
+        'Sí: es el mismo diagrama pero al revés'],4),
+      explicacion:'Del 4 salen varias flechas (Cuadrado, Rombo…). Invertir una función no siempre da otra función.' };
+  }
+
+  if (t==='definir'){
+    const k=rnd(2,4);
+    const ok=`Multiplicar por ${k}: 1→${k}, 2→${2*k}, 3→${3*k}`;
+    return { modulo:M, etiqueta:'Elegir la relación que es función', viz:'', fallas:[],
+      enunciado:`Dados A = {1, 2, 3} y B = {${k}, ${2*k}, ${3*k}}, ¿cuál de estas relaciones SÍ es función?`,
+      opciones: mkOpts(ok,[
+        `1→${k}, 1→${2*k}, 2→${2*k}, 3→${3*k}`,
+        `1→${k}, 3→${3*k} (el 2 no tiene flecha)`,
+        'Ninguna de las anteriores es función'],4),
+      explicacion:`Solo «Multiplicar por ${k}» cumple existencia y unicidad: cada elemento de A sale exactamente una vez.` };
+  }
+
+  if (t==='evaluar'){
+    const a=rnd(2,5), b=rnd(1,9), c=rnd(2,6), r=a*c+b;
+    return { modulo:M, etiqueta:`f(x) = ${a}x + ${b}, f(${c})`, viz:'', fallas:[],
+      enunciado:`Sea f(x) = ${a}x + ${b}. ¿Cuánto vale f(${c})?`,
+      opciones: mkOpts(String(r),[a+c+b, a*(c+b), a*c, a*c-b, c+b].map(String),4),
+      explicacion:`f(${c}) = ${a}·${c} + ${b} = ${r}.` };
+  }
+
+  if (t==='raiz'){
+    const A=['1','4'], B=['−2','−1','1','2'], fl=[[0,1],[0,2],[1,0],[1,3]];
+    return { modulo:M, etiqueta:'x → número cuyo cuadrado es x', fallas:[0,1],
+      enunciado:'Relación «x se conecta con los números cuyo cuadrado es x», de A = {1, 4} hacia B = {−2, −1, 1, 2}. ¿Es función?',
+      viz:svgConjuntos({A,B,flechas:fl,labelA:'A',labelB:'B'}),
+      opciones: mkOpts('No: cada elemento de A tiene dos flechas (falla la unicidad)',[
+        'Sí: todos los elementos de A tienen flecha',
+        'No: faltan flechas (falla la existencia)',
+        'Sí: B tiene más elementos que A'],4),
+      explicacion:'Cada número tiene dos raíces (por ejemplo 4 → 2 y −2), así que de cada uno salen dos flechas: no es función.' };
+  }
+
+  const n=rnd(2,5), mult=Math.random()<0.5, A=[1,2,3];
+  const ap=x=>mult?x*n:x+n, otra=x=>mult?x+n:x*n;
+  const ok=conj(A.map(ap));
+  return { modulo:M, etiqueta:`Rango de ${mult?`x × ${n}`:`x + ${n}`}`, viz:'', fallas:[],
+    enunciado:`Sea f(x) = x ${mult?'×':'+'} ${n} con dominio A = {1, 2, 3}. ¿Cuál es el rango?`,
+    opciones: mkOpts(ok,[conj(A), conj(A.map(x=>ap(x)+1)), conj(A.map(otra)), conj(A.map(x=>ap(x)-1))],4),
+    explicacion:`Se aplica f a cada elemento del dominio: ${A.map(x=>`f(${x}) = ${ap(x)}`).join(', ')}. El rango es ${ok}.` };
+}
+
+/* =========================================================
+   MÓDULOS
+========================================================= */
+const MODS=[
+  { id:'m1', corto:'Relaciones',   titulo:'Relaciones entre conjuntos', icono:'🔗', desc:'Leer diagramas con flechas.',              n:3, gen:genM1 },
+  { id:'m2', corto:'Funciones',    titulo:'¿Qué es una función?',       icono:'⚽', desc:'Existencia y unicidad.',                  n:3, gen:genM2 },
+  { id:'m3', corto:'Dominio y rango', titulo:'Dominio, codominio y rango', icono:'🎯', desc:'Entradas, salidas posibles y reales.',  n:3, gen:genM3 },
+  { id:'m4', corto:'Inversa',      titulo:'Función inversa',            icono:'🔄', desc:'Deshacer lo que hace una función.',       n:3, gen:genM4 },
+  { id:'m5', corto:'Retos',        titulo:'Retos abstractos',           icono:'🧠', desc:'Números, figuras y razonamiento.',        n:4, gen:genM5 },
+  { id:'m6', corto:'Flechas',      titulo:'Juego de flechas',           icono:'🏹', desc:'Tú construyes la relación.',              n:1, juego:true }
+];
+const TOTAL = MODS.reduce((s,m)=>s+m.n,0);
+
+function bancoDe(i){
+  const m=MODS[i];
+  if (!state.banco[m.id]){
+    const arr=[]; for(let k=0;k<m.n;k++){ const q=m.gen(k); q.id=m.id+'-'+k; arr.push(q); }
+    state.banco[m.id]=arr;
+  }
+  return state.banco[m.id];
+}
+function hecho(i){
+  const m=MODS[i];
+  if (m.juego) return Object.keys(state.registros).some(k=>k.startsWith('flechas'));
+  const b=state.banco[m.id]; return !!b && b.every(q=>q.sel!==undefined);
+}
+function desbloqueado(i){ for(let j=0;j<i;j++) if(!hecho(j)) return false; return true; }
+
+/* =========================================================
+   REGISTRO Y PROGRESO
+========================================================= */
+function registrar(key, modulo, pregunta, respuesta, correcta, correctaTxt){
+  state.registros[key]={ modulo, pregunta, respuesta, correcta, correctaTxt:correctaTxt||'' };
+}
+function pctProgreso(){
+  const ks=Object.keys(state.registros);
+  const q=ks.filter(k=>!k.startsWith('flechas')).length + (ks.some(k=>k.startsWith('flechas'))?1:0);
+  return Math.min(100, Math.round(q/TOTAL*100));
+}
+
+/* =========================================================
+   VISTAS
+========================================================= */
+function hudHTML(){
+  const p=pctProgreso();
+  return `<div class="steps" role="tablist">${MODS.map((m,i)=>{
+      const cls=(i===state.mod?'active ':'')+(hecho(i)?'done':'');
+      const dis=!(i===state.mod||desbloqueado(i));
+      return `<button class="step ${cls}" data-act="goto" data-i="${i}" ${dis?'disabled':''}><span class="n">${hecho(i)&&i!==state.mod?'✓':i+1}</span>${esc(m.corto)}</button>`;
+    }).join('')}</div>
+    <div class="progress" aria-label="Progreso"><div style="width:${p}%"></div></div>
+    <div class="prog-meta"><span>Módulo ${state.mod+1} de ${MODS.length}</span><span>${p}% completado</span></div>`;
+}
+function navHTML(){
+  const last=state.mod===MODS.length-1, ok=hecho(state.mod);
+  return `${state.mod>0?'<button class="btn ghost" data-act="prev">⬅️ Anterior</button>':'<span></span>'}
+    <button class="btn ${last?'accent':''} lg" data-act="next" ${ok?'':'disabled'}>${last?'🏁 Ver resultados':'Siguiente ➡️'}</button>`;
+}
+function actualizarHud(){ const h=$('#hud'); if(h) h.innerHTML=hudHTML(); const n=$('#navrow'); if(n) n.innerHTML=navHTML(); }
+
+function vistaInicio(){
+  return `
+  <section class="panel hero">
+    <div>
+      <span class="eyebrow">⚽ Matemáticas · Funciones</span>
+      <h1>El Penal de las Funciones</h1>
+    </div>
+    <p class="sub">Aprende <b>relaciones</b> y <b>funciones</b> con jugadores, arqueros y mucha práctica. Cada sesión trae preguntas nuevas.</p>
+    <div>
+      <label for="nombreInput" class="muted" style="font-weight:800;display:block;margin-bottom:6px">¿Cómo te llamas?</label>
+      <input id="nombreInput" class="field" type="text" placeholder="Tu nombre" maxlength="40" autocomplete="off" value="${esc(state.nombre)}">
+    </div>
+    <div class="row">
+      <button class="btn lg" data-act="empezar">🚀 Empezar</button>
+      <span class="tag">📶 Funciona sin internet</span>
+    </div>
+  </section>
+  <section class="panel panel-alt">
+    <h2>📚 Qué vas a practicar</h2>
+    <div class="cards">${MODS.map((m,i)=>`<div class="mcard"><div class="ic">${m.icono}</div><div><b>${i+1}. ${esc(m.titulo)}</b><span>${esc(m.desc)}</span></div></div>`).join('')}</div>
+    <p class="muted" style="margin-top:14px;font-weight:600">Al final verás tu resultado y podrás guardarlo como PDF.</p>
+  </section>`;
+}
+
+function teoria(i){
+  if (i===0) return `
+    <p class="lead">Una <b>relación</b> es una <b>conexión</b> entre elementos de dos conjuntos. Se dibuja con flechas de A hacia B.</p>
+    <ul>
+      <li>Un elemento de A puede tener <b>0, 1 o varias flechas</b>.</li>
+      <li>Varios elementos de A pueden llegar al <b>mismo</b> elemento de B.</li>
+      <li>En B puede haber elementos a los que no llega ninguna flecha.</li>
+    </ul>
+    <div class="callout">⚽ <b>Ejemplo:</b> «un pateador (A) le anotó a un arquero (B)». Messi pudo anotarle a dos arqueros, y Haaland a ninguno.</div>
+    ${svgConjuntos({A:['Messi','Kane','Haaland'],B:['Dibu','Courtois','Alisson'],flechas:[[0,0],[0,1],[1,1]],labelA:'Pateadores',labelB:'Arqueros'})}`;
+  if (i===1) return `
+    <p class="lead">Una <b>función</b> es una relación que cumple <b>DOS condiciones</b>:</p>
+    <ol>
+      <li><b>Existencia:</b> TODOS los elementos de A tienen flecha.</li>
+      <li><b>Unicidad:</b> cada elemento de A tiene EXACTAMENTE UNA flecha.</li>
+    </ol>
+    <div class="callout">⚽ <b>Penal:</b> cada pateador (A) tiene un solo resultado (B). Dos pateadores sí pueden fallar igual, pero uno no puede tener dos resultados a la vez.</div>
+    <div class="pair">
+      <div><div class="cap"><span class="tag" style="background:var(--ok)">✅ Sí es función</span></div>${svgConjuntos({A:['1','2','3'],B:['a','b','c'],flechas:[[0,0],[1,1],[2,1]],labelA:'A',labelB:'B'})}</div>
+      <div><div class="cap"><span class="tag" style="background:var(--bad)">❌ No es función</span></div>${svgConjuntos({A:['1','2','3'],B:['a','b','c'],flechas:[[0,0],[0,1],[1,2]],labelA:'A',labelB:'B'})}<p class="muted" style="font-weight:600">El 1 tiene dos flechas y el 3 ninguna.</p></div>
+    </div>`;
+  if (i===2) return `
+    <ul>
+      <li><b>Dominio:</b> el conjunto A (las entradas).</li>
+      <li><b>Codominio:</b> el conjunto B (todas las salidas posibles).</li>
+      <li><b>Rango:</b> los elementos de B que <b>realmente</b> reciben flecha.</li>
+      <li><b>Imagen</b> de x: el elemento de B al que llega la flecha de x.</li>
+    </ul>
+    ${svgConjuntos({A:['1','2','3'],B:['2','4','6','8'],flechas:[[0,0],[1,1],[2,2]],labelA:'Dominio',labelB:'Codominio'})}
+    <div class="callout">Aquí el rango es <b>{2, 4, 6}</b>. El 8 está en el codominio, pero ninguna flecha llega a él.</div>`;
+  if (i===3) return `
+    <p class="lead">La <b>función inversa</b> deshace lo que hace la función original.</p>
+    <div class="formulas">
+      <div class="fcard"><small>Si f suma…</small>f(x) = x + n <span class="arrow">→</span> f⁻¹(x) = x − n</div>
+      <div class="fcard"><small>Si f resta…</small>f(x) = x − n <span class="arrow">→</span> f⁻¹(x) = x + n</div>
+      <div class="fcard"><small>Si f multiplica…</small>f(x) = x × n <span class="arrow">→</span> f⁻¹(x) = x ÷ n</div>
+      <div class="fcard"><small>Si f divide…</small>f(x) = x ÷ n <span class="arrow">→</span> f⁻¹(x) = x × n</div>
+    </div>
+    <div class="callout">Si f(3) = 8, entonces f⁻¹(8) = 3: la inversa regresa a donde empezaste.</div>`;
+  if (i===4) return `<p class="lead">Salimos del fútbol: ahora a pensar con <b>números</b>, <b>figuras</b> y <b>reglas abstractas</b>. Aplica las dos condiciones y no te dejes engañar por flechas que comparten destino.</p>`;
+  return `<p class="lead">Ahora <b>tú</b> construyes la relación. Cumple la misión y pulsa <b>Verificar</b>. Puedes jugar todas las misiones que quieras.</p>`;
+}
+
+function vistaModulo(){
+  const m=MODS[state.mod];
+  return `
+  <div class="hud" id="hud">${hudHTML()}</div>
+  <section class="panel">
+    <span class="eyebrow">${m.icono} Módulo ${state.mod+1}</span>
+    <h2>${esc(m.titulo)}</h2>
+    ${teoria(state.mod)}
+  </section>
+  <section class="panel panel-alt">
+    <h3>🎯 ${m.juego?'Tu desafío':'Practica'}</h3>
+    <div id="${m.juego?'juegoF':'juego'}"></div>
+  </section>
+  <div class="navrow" id="navrow">${navHTML()}</div>`;
+}
+
+function vistaFinal(){
+  const regs=Object.values(state.registros), tot=regs.length, ok=regs.filter(r=>r.correcta).length;
+  const pct=tot?Math.round(ok/tot*100):0;
+  const msg=pct>=80?'🏆 ¡Excelente trabajo!':pct>=50?'👍 ¡Buen intento, vas por buen camino!':'💪 ¡Sigue practicando, la próxima sale mejor!';
+  const porMod={}; regs.forEach(r=>{ (porMod[r.modulo]=porMod[r.modulo]||{t:0,o:0}); porMod[r.modulo].t++; if(r.correcta) porMod[r.modulo].o++; });
+  return `
+  <section class="panel center">
+    <div class="ring" style="--p:${pct}"><div><b>${pct}%</b><small>${ok} / ${tot}</small></div></div>
+    <h1 style="font-size:clamp(1.7rem,5vw,2.4rem)">¡Terminaste, ${esc(state.nombre||'campeón')}!</h1>
+    <p class="lead" style="margin-top:8px">${msg}</p>
+    <div class="row" style="margin-top:22px">
+      <button class="btn lg" data-act="pdf">📄 Guardar como PDF</button>
+      <button class="btn ghost lg" data-act="reiniciar">🔄 Volver a empezar</button>
+    </div>
+  </section>
+  <section class="panel panel-alt">
+    <h2>📊 Por módulo</h2>
+    ${Object.entries(porMod).map(([k,v])=>`<div class="mrow"><span>${esc(k)}</span><div class="progress"><div style="width:${Math.round(v.o/v.t*100)}%"></div></div><span>${v.o}/${v.t}</span></div>`).join('')}
+  </section>
+  <section class="panel">
+    <h2>📋 Revisión</h2>
+    ${regs.map((r,i)=>`<div class="rev"><span class="ic">${r.correcta?'✅':'❌'}</span><div><b>${i+1}. [${esc(r.modulo)}] ${esc(r.pregunta)}</b><small>Tu respuesta: ${esc(r.respuesta)}</small>${!r.correcta&&r.correctaTxt?`<small>Correcta: ${esc(r.correctaTxt)}</small>`:''}</div></div>`).join('')}
+    <div class="navrow"><button class="btn ghost" data-act="goto" data-i="${MODS.length-1}">⬅️ Volver al último módulo</button></div>
+  </section>`;
+}
+
+/* =========================================================
+   PREGUNTAS (render + respuesta)
+========================================================= */
+function pintarPreguntas(){
+  const cont=$('#juego'), qs=bancoDe(state.mod);
+  cont.innerHTML=qs.map((p,i)=>`
+    <article class="q" data-q="${i}">
+      <div class="q-head">
+        <span class="q-num">${i+1}</span>
+        <div class="q-title">${esc(p.enunciado)}</div>
+        <button class="speak" data-act="say" data-q="${i}" aria-label="Leer en voz alta">🔈</button>
+      </div>
+      ${p.viz||''}
+      <div class="q-options">${p.opciones.map((o,k)=>`<button class="option" data-act="op" data-q="${i}" data-o="${k}"><span class="chip">${'ABCD'[k]}</span><span>${esc(o.texto)}</span></button>`).join('')}</div>
+      <div class="feedback" role="status"></div>
+    </article>`).join('');
+  qs.forEach((p,i)=>{ if(p.sel!==undefined) marcar(p, cont.children[i], p.sel); });
+}
+function marcar(p, block, o){
+  const ok=p.opciones[o].correcta;
+  block.classList.add('done');
+  block.querySelectorAll('.option').forEach((b,k)=>{
+    if(k===o) b.classList.add(ok?'correct':'wrong');
+    else if(p.opciones[k].correcta) b.classList.add(ok?'':'reveal');
+  });
+  block.querySelectorAll('.node-a').forEach(g=>{ if(p.fallas && p.fallas.includes(+g.dataset.idx)) g.classList.add('node-fail'); });
+  const fb=block.querySelector('.feedback');
+  fb.className='feedback show '+(ok?'ok':'bad');
+  fb.innerHTML=`<span class="fi">${ok?'✅':'❌'}</span><div><b>${ok?'¡Correcto!':'Casi.'}</b> ${esc(p.explicacion)}</div>`;
+}
+function responder(qi,o){
+  const p=bancoDe(state.mod)[qi];
+  if (p.sel!==undefined) return;
+  p.sel=o;
+  const ok=p.opciones[o].correcta;
+  marcar(p, $('#juego').children[qi], o);
+  registrar(p.id, p.modulo, p.etiqueta, p.opciones[o].texto, ok, p.opciones.find(x=>x.correcta).texto);
+  if (ok) sfxOk(); else sfxBad();
+  hablar(ok?'¡Correcto!':'Casi. '+p.explicacion);
+  actualizarHud();
+}
+
+/* =========================================================
+   JUEGO DE FLECHAS
+========================================================= */
+const MISIONES=[
+  { id:'funcion',       corto:'Construir una función',
+    texto:'Construye una relación que SÍ sea función: todos los elementos de A con exactamente una flecha.' },
+  { id:'no_existencia', corto:'No función por existencia',
+    texto:'Construye una relación que NO sea función porque falla la EXISTENCIA: deja a alguien de A sin flecha, pero a nadie con dos.' },
+  { id:'no_unicidad',   corto:'No función por unicidad',
+    texto:'Construye una relación que NO sea función porque falla la UNICIDAD: algún elemento de A con dos flechas, y todos con al menos una.' },
+  { id:'comparte',      corto:'Función con imagen compartida',
+    texto:'Construye una FUNCIÓN en la que dos elementos de A lleguen al mismo elemento de B.' }
+];
+function nuevoJuegoF(){
+  const nA=rnd(3,4), nB=rnd(3,4);
+  state.nF++;
+  state.juegoF={ id:state.nF, A:rangoNums(1,nA).map(i=>'a'+i), B:rangoNums(1,nB).map(i=>'b'+i),
+                 mision:pick(MISIONES), con:[], sel:null, resultado:null };
+}
+function pintarJuegoF(){
+  if (!state.juegoF) nuevoJuegoF();
+  const j=state.juegoF, cont=$('#juegoF');
+  cont.innerHTML=`
+    <div class="mission"><span>🎯</span><div><small>Misión ${j.id}</small><br>${esc(j.mision.texto)}</div></div>
+    <p class="hint">Toca un elemento y luego uno del otro conjunto para dibujar una flecha. Toca una flecha para borrarla.</p>
+    <div class="game" id="gameWrap">
+      <svg class="game-svg" id="gameSvg" aria-hidden="true"></svg>
+      <div class="game-cols">
+        <div class="game-col"><span class="col-title">Conjunto A</span>${j.A.map((v,i)=>`<button class="node" id="nA${i}" data-act="gnode" data-side="A" data-idx="${i}">${esc(v)}<span class="cnt"></span></button>`).join('')}</div>
+        <div class="game-col"><span class="col-title">Conjunto B</span>${j.B.map((v,i)=>`<button class="node b" id="nB${i}" data-act="gnode" data-side="B" data-idx="${i}">${esc(v)}<span class="cnt"></span></button>`).join('')}</div>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn ghost" data-act="gundo">↩ Deshacer</button>
+      <button class="btn ghost" data-act="gclear">🧹 Limpiar</button>
+      <button class="btn" data-act="gverify">✅ Verificar</button>
+      <button class="btn accent" data-act="gnew">🎲 Otra misión</button>
+    </div>
+    <div class="feedback" id="fbF" role="status"></div>`;
+  refrescarF();
+  if (j.resultado) mostrarFbF(j.resultado.ok, j.resultado.msg);
+}
+function mostrarFbF(ok,msg){
+  const fb=$('#fbF'); if(!fb) return;
+  fb.className='feedback show '+(ok?'ok':'bad');
+  fb.innerHTML=`<span class="fi">${ok?'✅':'💡'}</span><div>${esc(msg)}</div>`;
+}
+function refrescarF(){
+  const j=state.juegoF; if(!j) return;
+  const cA=j.A.map(()=>0), cB=j.B.map(()=>0);
+  j.con.forEach(([a,b])=>{ cA[a]++; cB[b]++; });
+  const setCnt=(id,n)=>{ const c=$(id+' .cnt'); if(c){ c.textContent=n; c.classList.toggle('on',n>0); } };
+  j.A.forEach((_,i)=>{ const el=$('#nA'+i); if(!el) return; el.classList.toggle('sel', !!j.sel&&j.sel.side==='A'&&j.sel.idx===i); setCnt('#nA'+i,cA[i]); });
+  j.B.forEach((_,i)=>{ const el=$('#nB'+i); if(!el) return; el.classList.toggle('sel', !!j.sel&&j.sel.side==='B'&&j.sel.idx===i); setCnt('#nB'+i,cB[i]); });
+  dibujarLineasF();
+}
+function dibujarLineasF(){
+  const j=state.juegoF, wrap=$('#gameWrap'), svg=$('#gameSvg');
+  if (!j||!wrap||!svg) return;
+  const r=wrap.getBoundingClientRect();
+  svg.setAttribute('width',r.width); svg.setAttribute('height',r.height);
+  let s=`<defs><marker id="gm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--text)"/></marker></defs>`;
+  j.con.forEach(([a,b],k)=>{
+    const ea=$('#nA'+a), eb=$('#nB'+b); if(!ea||!eb) return;
+    const ra=ea.getBoundingClientRect(), rb=eb.getBoundingClientRect();
+    const x1=ra.right-r.left+3, y1=ra.top+ra.height/2-r.top, x2=rb.left-r.left-5, y2=rb.top+rb.height/2-r.top;
+    s+=`<line class="hit" data-act="gline" data-k="${k}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><line class="gl" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" marker-end="url(#gm)"/>`;
+  });
+  svg.innerHTML=s;
+}
+function evaluarF(j){
+  const an=analizar(j.A,j.con), nom=i=>j.A[i];
+  const llegadas=j.B.map(()=>0); j.con.forEach(([,b])=>llegadas[b]++);
+  const comparte=llegadas.some(x=>x>=2);
+  const pistaFn=()=>{
+    const p=[];
+    if (an.sinFlecha.length) p.push(`Falta conectar: ${lista(an.sinFlecha.map(nom))}.`);
+    if (an.varias.length)    p.push(`Tienen más de una flecha: ${lista(an.varias.map(nom))}.`);
+    return p.join(' ');
+  };
+  if (!j.con.length) return { ok:false, msg:'Dibuja al menos una flecha antes de verificar.' };
+  switch(j.mision.id){
+    case 'funcion':
+      return an.ok ? { ok:true,  msg:'¡Perfecto! Es función: cada elemento de A tiene exactamente una flecha.' }
+                   : { ok:false, msg:pistaFn() };
+    case 'no_existencia':
+      if (an.varias.length)     return { ok:false, msg:`Quita las flechas dobles de ${lista(an.varias.map(nom))}: aquí solo debe fallar la existencia.` };
+      if (!an.sinFlecha.length) return { ok:false, msg:'Ahora todos tienen flecha, así que sí es función. Deja a un elemento de A sin conectar.' };
+      return { ok:true, msg:`¡Correcto! No es función: ${lista(an.sinFlecha.map(nom))} no tiene flecha (falla la existencia).` };
+    case 'no_unicidad':
+      if (an.sinFlecha.length)  return { ok:false, msg:`Conecta también a ${lista(an.sinFlecha.map(nom))}: aquí solo debe fallar la unicidad.` };
+      if (!an.varias.length)    return { ok:false, msg:'Ahora es función. Dale dos flechas a algún elemento de A.' };
+      return { ok:true, msg:`¡Correcto! No es función: ${lista(an.varias.map(nom))} tiene más de una flecha (falla la unicidad).` };
+    default:
+      if (!an.ok)   return { ok:false, msg:pistaFn() };
+      if (!comparte) return { ok:false, msg:'Es función, pero ningún elemento de B recibe dos flechas. Haz que dos elementos de A lleguen al mismo B.' };
+      return { ok:true, msg:'¡Muy bien! Dos elementos de A comparten imagen y sigue siendo función. Lo prohibido es que UN elemento de A tenga dos flechas.' };
+  }
+}
+function gnode(t){
+  const j=state.juegoF; if(!j) return;
+  const side=t.dataset.side, idx=+t.dataset.idx;
+  sfxClick();
+  if (!j.sel) j.sel={side,idx};
+  else if (j.sel.side===side) j.sel=(j.sel.idx===idx)?null:{side,idx};
+  else {
+    const a=side==='A'?idx:j.sel.idx, b=side==='B'?idx:j.sel.idx;
+    const k=j.con.findIndex(c=>c[0]===a&&c[1]===b);
+    if (k>=0) j.con.splice(k,1); else { j.con.push([a,b]); sfxOk(); }
+    j.sel=null; j.resultado=null;
+    const fb=$('#fbF'); if(fb) fb.className='feedback';
+  }
+  refrescarF();
+}
+function verificarF(){
+  const j=state.juegoF, r=evaluarF(j);
+  j.resultado=r;
+  mostrarFbF(r.ok,r.msg);
+  if (j.con.length){
+    registrar('flechas-'+j.id,'Módulo 6','Misión: '+j.mision.corto,
+      j.con.map(([a,b])=>`${j.A[a]}→${j.B[b]}`).join(', '), r.ok, '');
+  }
+  if (r.ok) sfxOk(); else sfxBad();
+  hablar(r.ok?'¡Muy bien!':'Inténtalo otra vez');
+  actualizarHud();
+}
+
+/* =========================================================
+   PDF (iframe oculto: no depende de ventanas emergentes)
+========================================================= */
+function descargarPDF(){
+  const fecha=new Date().toLocaleString('es-CO');
+  const regs=Object.values(state.registros), ok=regs.filter(r=>r.correcta).length, tot=regs.length;
+  const pct=tot?Math.round(ok/tot*100):0;
+  const filas=regs.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.modulo)}</td><td>${esc(r.pregunta)}</td><td>${esc(r.respuesta)}</td><td style="color:${r.correcta?'#14803c':'#c1121f'};font-weight:bold">${r.correcta?'Sí':'No'}</td><td>${r.correcta?'':esc(r.correctaTxt)}</td></tr>`).join('');
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Reporte - ${esc(state.nombre)}</title>
+  <style>body{font-family:Arial,sans-serif;padding:24px;color:#111}h1{color:#1b7f2a;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse;margin-top:16px;font-size:12px}th,td{border:1px solid #444;padding:7px;text-align:left;vertical-align:top}
+  th{background:#eafbe0}.res{background:#f0f0f0;padding:10px 14px;border:2px solid #333;display:inline-block;margin:12px 0;font-size:16px}
+  tr{page-break-inside:avoid}</style></head><body>
+  <h1>⚽ Reporte: Relaciones y Funciones</h1>
+  <p><b>Estudiante:</b> ${esc(state.nombre||'(sin nombre)')}</p><p><b>Fecha:</b> ${esc(fecha)}</p>
+  <p class="res"><b>Puntaje:</b> ${ok} / ${tot} (${pct}%)</p>
+  <table><thead><tr><th>#</th><th>Módulo</th><th>Pregunta</th><th>Respuesta</th><th>¿Correcta?</th><th>Respuesta correcta</th></tr></thead><tbody>${filas}</tbody></table>
+  </body></html>`;
+  const f=document.createElement('iframe');
+  f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  f.onload=()=>{ try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){} setTimeout(()=>f.remove(),60000); };
+  f.srcdoc=html;
+  document.body.appendChild(f);
+}
+
+/* =========================================================
+   NAVEGACIÓN Y ACCIONES
+========================================================= */
+function render(){
+  const app=$('#app');
+  app.innerHTML = state.vista==='inicio' ? vistaInicio() : state.vista==='final' ? vistaFinal() : vistaModulo();
+  window.scrollTo({top:0});
+  if (state.vista==='mod'){ if (MODS[state.mod].juego) pintarJuegoF(); else pintarPreguntas(); }
+  if (state.vista==='final') sfxWin();
+}
+function ir(i){ callar(); state.vista='mod'; state.mod=i; render(); }
+function reiniciar(){
+  callar();
+  state.vista='inicio'; state.mod=0; state.banco={}; state.registros={}; state.juegoF=null; state.nF=0;
+  render();
+}
+function empezar(){
+  const inp=$('#nombreInput'), n=inp.value.trim();
+  if (!n){ inp.classList.add('err'); inp.focus(); setTimeout(()=>inp.classList.remove('err'),400); return; }
+  state.nombre=n; store.set('nombre',n);
+  state.banco={}; state.registros={}; state.juegoF=null; state.nF=0;
+  sfxClick(); ir(0);
+}
+
+const acciones={
+  empezar,
+  goto:  t=>{ sfxClick(); const i=+t.dataset.i; state.vista='mod'; if(i===state.mod&&state.vista==='mod'){} ir(i); },
+  prev:  ()=>{ sfxClick(); ir(state.mod-1); },
+  next:  ()=>{ sfxClick(); if(state.mod>=MODS.length-1){ callar(); state.vista='final'; render(); } else ir(state.mod+1); },
+  op:    t=>{ sfxClick(); responder(+t.dataset.q, +t.dataset.o); },
+  say:   t=>{ const p=bancoDe(state.mod)[+t.dataset.q]; const prev=state.voz; state.voz=true; hablar(p.enunciado); state.voz=prev; },
+  gnode, gverify:verificarF,
+  gline: t=>{ const j=state.juegoF; j.con.splice(+t.dataset.k,1); j.resultado=null; j.sel=null; const fb=$('#fbF'); if(fb) fb.className='feedback'; sfxClick(); refrescarF(); },
+  gundo: ()=>{ const j=state.juegoF; if(!j.con.length) return; j.con.pop(); j.resultado=null; const fb=$('#fbF'); if(fb) fb.className='feedback'; sfxClick(); refrescarF(); },
+  gclear:()=>{ const j=state.juegoF; j.con=[]; j.sel=null; j.resultado=null; const fb=$('#fbF'); if(fb) fb.className='feedback'; sfxClick(); refrescarF(); },
+  gnew:  ()=>{ sfxClick(); nuevoJuegoF(); pintarJuegoF(); },
+  pdf:   ()=>{ sfxClick(); descargarPDF(); },
+  reiniciar:()=>{ if(confirm('¿Volver a empezar? Se generarán preguntas nuevas.')){ sfxClick(); reiniciar(); } }
+};
+$('#app').addEventListener('click', e=>{
+  const t=e.target.closest('[data-act]');
+  if (!t || t.disabled) return;
+  const fn=acciones[t.dataset.act]; if (fn) fn(t,e);
+});
+$('#app').addEventListener('keydown', e=>{
+  if (e.key==='Enter' && e.target.id==='nombreInput') empezar();
+});
+window.addEventListener('resize', dibujarLineasF);
+
+/* =========================================================
+   AJUSTES
+========================================================= */
+function aplicarTema(){
+  document.body.className='theme-'+state.tema;
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.toggle('active',c.dataset.theme===state.tema));
+  if (state.vista==='mod' && MODS[state.mod].juego) setTimeout(dibujarLineasF,0);
+}
+function aplicarSonido(){
+  $('#swSfx').classList.toggle('on',state.sfx);
+  $('#swVoz').classList.toggle('on',state.voz);
+  $('#btnMute').textContent = (state.sfx||state.voz) ? '🔊' : '🔇';
+}
+function initSettings(){
+  const modal=$('#settingsModal');
+  const abrir=()=>{ sfxClick(); modal.classList.add('show'); };
+  const cerrar=()=>{ modal.classList.remove('show'); };
+  $('#btnSettings').onclick=abrir;
+  $('#btnCloseSettings').onclick=cerrar;
+  modal.addEventListener('click',e=>{ if(e.target===modal) cerrar(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') cerrar(); });
+
+  document.querySelectorAll('.theme-card').forEach(card=>{
+    card.onclick=()=>{ sfxClick(); state.tema=card.dataset.theme; store.set('tema',state.tema); aplicarTema(); };
+  });
+  $('#swSfx').onclick=()=>{ state.sfx=!state.sfx; store.set('sfx',state.sfx); aplicarSonido(); if(state.sfx) sfxClick(); };
+  $('#swVoz').onclick=()=>{ state.voz=!state.voz; store.set('voz',state.voz); aplicarSonido(); if(!state.voz) callar(); };
+  $('#btnMute').onclick=()=>{
+    const encender=!(state.sfx||state.voz);
+    state.sfx=encender; state.voz=encender;
+    store.set('sfx',state.sfx); store.set('voz',state.voz);
+    aplicarSonido(); if(encender) sfxClick(); else callar();
+  };
+  $('#btnRestart').onclick=()=>{ if(confirm('¿Reiniciar todo?')){ cerrar(); reiniciar(); } };
+  aplicarTema(); aplicarSonido();
+}
+
+/* =========================================================
+   INICIO
+========================================================= */
+initSettings();
+render();
+</script>
+</body>
+</html>
